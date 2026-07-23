@@ -182,6 +182,51 @@ class MicrosoftGraph
         return array_keys($busyDates);
     }
 
+    /**
+     * Like getBusyDates(), but returns the actual event details (subject,
+     * start/end, all-day flag) grouped by every 'Y-m-d' date they cover,
+     * rather than just a plain busy/not-busy flag. Used by the admin
+     * calendar view to show what a "Synced Event" actually is.
+     *
+     * @return array<string, array<int, array{subject: string, isAllDay: bool, start: ?string, end: ?string}>>
+     */
+    public static function getEventDetailsByDate(array $calendarAccount, DateTimeImmutable $start, DateTimeImmutable $end): array
+    {
+        $accessToken = self::ensureValidAccessToken($calendarAccount);
+        $mailbox = rawurlencode($calendarAccount['mailbox_email']);
+
+        $params = [
+            'startDateTime' => $start->format('Y-m-d\T00:00:00'),
+            'endDateTime' => $end->format('Y-m-d\T23:59:59'),
+            '$select' => 'subject,start,end,isAllDay',
+            '$top' => '100',
+        ];
+        $path = "/users/{$mailbox}/calendar/calendarView?" . http_build_query($params);
+
+        $byDate = [];
+        $guard = 0;
+        while ($path && $guard++ < 20) {
+            [$status, $json] = self::request('GET', $path, $accessToken, null, true);
+            if ($status >= 400) {
+                throw new RuntimeException('Graph calendarView error: ' . json_encode($json));
+            }
+            foreach ($json['value'] ?? [] as $event) {
+                $detail = [
+                    'subject' => $event['subject'] ?? '(No subject)',
+                    'isAllDay' => (bool) ($event['isAllDay'] ?? false),
+                    'start' => $event['start']['dateTime'] ?? null,
+                    'end' => $event['end']['dateTime'] ?? null,
+                ];
+                foreach (self::eventDateRange($event) as $d) {
+                    $byDate[$d][] = $detail;
+                }
+            }
+            $path = $json['@odata.nextLink'] ?? null;
+        }
+
+        return $byDate;
+    }
+
     private static function eventDateRange(array $event): array
     {
         $startTs = strtotime($event['start']['dateTime'] ?? '');

@@ -100,14 +100,19 @@ $calendars = db()->query('SELECT * FROM calendar_accounts ORDER BY label')->fetc
 // `bookings` row (e.g. an event created directly in Outlook, not through
 // this app) — without this, such dates would incorrectly show as
 // "Available" here even though the client-facing calendar already
-// correctly blocks them via this same Graph check.
-$graphBusyDates = [];
+// correctly blocks them via this same Graph check. Keeping the actual
+// event details (not just a busy flag) lets the details panel below show
+// what a "Synced Event" day actually is.
+$graphEventsByDate = [];
 $graphOk = true;
 $syncIssues = [];
 foreach ($calendars as $cal) {
     try {
-        foreach (MicrosoftGraph::getBusyDates($cal, $start, $end) as $iso) {
-            $graphBusyDates[$iso] = true;
+        foreach (MicrosoftGraph::getEventDetailsByDate($cal, $start, $end) as $iso => $events) {
+            foreach ($events as $event) {
+                $event['calendar_label'] = $cal['label'];
+                $graphEventsByDate[$iso][] = $event;
+            }
         }
     } catch (Throwable $e) {
         $graphOk = false;
@@ -163,7 +168,7 @@ require __DIR__ . '/../../includes/partials/header.php';
             $dayOfWeek = (int) date('w', strtotime($iso));
             $isWeekend = $dayOfWeek === 0 || $dayOfWeek === 6;
             $isBlocked = isset($blockedByDate[$iso]);
-            $isGraphBusy = isset($graphBusyDates[$iso]);
+            $isGraphBusy = isset($graphEventsByDate[$iso]);
             $isPast = $iso < $todayIso;
             $isSelected = $selectedDate === $iso;
             $isToday = $iso === $todayIso;
@@ -225,6 +230,31 @@ require __DIR__ . '/../../includes/partials/header.php';
         <div class="alert alert--warning">
             This date is manually blocked<?= $blockedByDate[$selectedDate] ? ': ' . h($blockedByDate[$selectedDate]) : '.' ?>
         </div>
+    <?php endif; ?>
+
+    <?php if ($selectedDate && isset($graphEventsByDate[$selectedDate])): ?>
+        <h3>Synced calendar events</h3>
+        <div class="table-scroll">
+        <table class="data-table">
+            <thead><tr><th>Calendar</th><th>Subject</th><th>Time</th></tr></thead>
+            <tbody>
+            <?php foreach ($graphEventsByDate[$selectedDate] as $event): ?>
+                <tr>
+                    <td><?= h($event['calendar_label']) ?></td>
+                    <td><?= h($event['subject']) ?></td>
+                    <td>
+                        <?php if ($event['isAllDay'] || !$event['start'] || !$event['end']): ?>
+                            All day
+                        <?php else: ?>
+                            <?= h(date('H:i', strtotime($event['start']))) ?>&ndash;<?= h(date('H:i', strtotime($event['end']))) ?>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+        </div>
+        <p class="muted">These come directly from the connected Outlook calendar(s) — not bookings made through this app.</p>
     <?php endif; ?>
 
     <?php if (!$displayedBookings): ?>
