@@ -1,0 +1,19 @@
+# Force HTTPS (skip when running locally via `php -S`, which never reads .htaccess anyway)
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP_HOST} !^localhost
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Defense in depth: if includes/lib/sql ever end up copied under the document
+# root by mistake, never serve their contents.
+<FilesMatch "\.(sql|env)$">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+Options -Indexes
