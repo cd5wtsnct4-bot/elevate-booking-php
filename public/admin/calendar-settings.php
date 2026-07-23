@@ -167,6 +167,13 @@ require __DIR__ . '/../../includes/partials/header.php';
             <code>admin@seanp.co.za</code> Microsoft account (which needs Full Access delegate permission
             on that shared mailbox — see DEPLOY.md) and enter <code>info@seanp.co.za</code> above.
         </p>
+        <p class="muted">
+            <strong>If Microsoft Graph can't find that mailbox after connecting</strong> (a sync error
+            mentioning it couldn't resolve the account), the mailbox's underlying Microsoft 365 sign-in
+            name may differ from its email address — check <strong>Recipients &rarr; Mailboxes</strong> in
+            the Exchange admin center for its actual <em>UserPrincipalName</em>, and enter that here
+            instead of the email address.
+        </p>
         <button type="submit" class="btn btn--primary">Connect with Microsoft</button>
     </form>
 </section>
