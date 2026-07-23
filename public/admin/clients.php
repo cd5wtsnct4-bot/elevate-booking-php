@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($id === $admin['id']) {
         flash('error', "You can't modify your own account from here.");
-        redirect('/admin/clients.php');
+        redirect(url('/admin/clients.php'));
     }
 
     if ($action === 'toggle_status') {
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         flash('success', 'Client deleted.');
     }
 
-    redirect('/admin/clients.php');
+    redirect(url('/admin/clients.php'));
 }
 
 $clients = db()->query(
@@ -40,7 +40,7 @@ require __DIR__ . '/../../includes/partials/header.php';
 ?>
 <div class="page-intro page-intro--with-action">
     <h1>Clients</h1>
-    <a href="/admin/client-form.php" class="btn btn--primary">+ Add client</a>
+    <a href="<?= url('/admin/client-form.php') ?>" class="btn btn--primary">+ Add client</a>
 </div>
 
 <?php if (!$clients): ?>
@@ -58,7 +58,7 @@ require __DIR__ . '/../../includes/partials/header.php';
             <td><span class="status-pill status-pill--<?= $c['status'] === 'active' ? 'approved' : 'declined' ?>"><?= h(ucfirst($c['status'])) ?></span></td>
             <td><?= h(date('j M Y', strtotime($c['created_at']))) ?></td>
             <td class="data-table__actions">
-                <a href="/admin/client-form.php?id=<?= (int) $c['id'] ?>">Edit</a>
+                <a href="<?= url('/admin/client-form.php?id=' . (int) $c['id']) ?>">Edit</a>
                 <form method="post" class="inline-form">
                     <?= csrfField() ?>
                     <input type="hidden" name="action" value="toggle_status">

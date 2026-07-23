@@ -14,13 +14,13 @@ if (($_GET['action'] ?? '') === 'callback') {
 
     if (!$pending || !hash_equals($pending['state'], (string) $state)) {
         flash('error', 'Calendar connection expired or invalid. Please try again.');
-        redirect('/admin/calendar-settings.php');
+        redirect(url('/admin/calendar-settings.php'));
     }
     unset($_SESSION['pending_calendar_connect']);
 
     if (isset($_GET['error'])) {
         flash('error', 'Microsoft sign-in was cancelled or failed: ' . h($_GET['error_description'] ?? $_GET['error']));
-        redirect('/admin/calendar-settings.php');
+        redirect(url('/admin/calendar-settings.php'));
     }
 
     try {
@@ -62,7 +62,7 @@ if (($_GET['action'] ?? '') === 'callback') {
         flash('error', 'Could not connect that calendar: ' . $e->getMessage());
     }
 
-    redirect('/admin/calendar-settings.php');
+    redirect(url('/admin/calendar-settings.php'));
 }
 
 // --- Start a new connection ---
@@ -73,11 +73,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'conne
 
     if ($label === '') {
         flash('error', 'Give this calendar a label, e.g. "Admin" or "Info (shared)".');
-        redirect('/admin/calendar-settings.php');
+        redirect(url('/admin/calendar-settings.php'));
     }
     if ($sharedMailbox !== '' && !isValidEmail($sharedMailbox)) {
         flash('error', 'The shared mailbox address is not a valid email.');
-        redirect('/admin/calendar-settings.php');
+        redirect(url('/admin/calendar-settings.php'));
     }
 
     $state = randomToken(16);
@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'disco
     requireCsrf();
     db()->prepare('DELETE FROM calendar_accounts WHERE id = ?')->execute([(int) ($_POST['id'] ?? 0)]);
     flash('success', 'Calendar disconnected.');
-    redirect('/admin/calendar-settings.php');
+    redirect(url('/admin/calendar-settings.php'));
 }
 
 $calendars = db()->query('SELECT * FROM calendar_accounts ORDER BY label')->fetchAll();

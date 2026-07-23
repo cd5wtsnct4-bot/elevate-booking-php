@@ -5,6 +5,29 @@ function h(?string $value): string
     return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8');
 }
 
+/**
+ * The path component of APP_BASE_URL, e.g. '' when the app sits at the
+ * domain root, or '/bookings' when it's deployed into a subfolder
+ * (https://seanp.co.za/bookings). Every internal link, redirect, and asset
+ * reference should go through this (via url()) instead of a bare
+ * root-relative path, so moving the app between a subfolder and the domain
+ * root is just a one-line APP_BASE_URL change.
+ */
+function basePath(): string
+{
+    static $path = null;
+    if ($path === null) {
+        $path = rtrim((string) parse_url(APP_BASE_URL, PHP_URL_PATH), '/');
+    }
+    return $path;
+}
+
+/** Prefixes a root-relative app path (e.g. '/admin/dashboard.php') with basePath(). */
+function url(string $path): string
+{
+    return basePath() . $path;
+}
+
 function redirect(string $path): never
 {
     header('Location: ' . $path);

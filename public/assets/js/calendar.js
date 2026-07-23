@@ -12,6 +12,7 @@
     }
 
     function init(opts) {
+        const basePath = opts.basePath || '';
         const state = {
             year: new Date().getFullYear(),
             month: new Date().getMonth() + 1,
@@ -19,7 +20,7 @@
         };
 
         function load() {
-            fetch('/api/availability.php?year=' + state.year + '&month=' + state.month, {
+            fetch(basePath + '/api/availability.php?year=' + state.year + '&month=' + state.month, {
                 credentials: 'same-origin',
             })
                 .then((r) => r.json())
@@ -99,7 +100,7 @@
             const submitBtn = opts.formEl.querySelector('button[type="submit"]');
             submitBtn.disabled = true;
 
-            fetch('/api/book.php', {
+            fetch(basePath + '/api/book.php', {
                 method: 'POST',
                 credentials: 'same-origin',
                 headers: { 'Content-Type': 'application/json' },

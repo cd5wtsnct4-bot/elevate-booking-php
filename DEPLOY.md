@@ -15,31 +15,42 @@ In cPanel → **MySQL® Databases**:
 
 ## 2. Upload the files
 
-This project has three top-level pieces:
+The site is deployed into a **subfolder** so it's reachable at
+`https://seanp.co.za/bookings` rather than the domain root. This project has
+three top-level pieces:
 
-- `public/` — must become your **document root** (or the contents of
-  `public_html/`, if your host doesn't let you point the document root
-  elsewhere — see note below).
-- `includes/` and `lib/` and `sql/` — must **not** be web-accessible.
+- `public/` — its *contents* go into `public_html/bookings/` (create that
+  folder if it doesn't exist).
+- `includes/`, `lib/`, `sql/` — must sit as **siblings of the `bookings/`
+  folder** (i.e. directly inside `public_html/`, next to `bookings/` — not
+  inside it). Every file under `public/` reaches `includes/` via a fixed
+  number of `../` segments counted from `public/` itself (e.g.
+  `public/admin/*.php` uses `__DIR__ . '/../../includes/...'`), so once
+  `public/`'s contents are nested one level deeper (inside `bookings/`),
+  `includes/`, `lib/`, and `sql/` must move one level deeper too, to stay
+  the same relative distance away.
 
-**If your host lets you change the document root** (cPanel → **Domains** →
-edit the domain → Document Root): point it at a folder *outside*
-`public_html`, e.g. upload the whole project to
-`/home/yourcpaneluser/elevate-booking/` and set the document root to
-`/home/yourcpaneluser/elevate-booking/public`. This is the safest layout —
-`includes/`, `lib/`, and `sql/` sit outside the web-servable tree entirely.
+So the layout on the server is:
 
-**If your host does not let you change the document root:** upload the
-*contents* of `public/` directly into `public_html/`, and upload `includes/`,
-`lib/`, and `sql/` as siblings of `public_html/` (i.e.
-`/home/yourcpaneluser/includes/`, etc. — one level up, not inside
-`public_html/`). Either way, `includes/db.php` loads `config.php` with
-`require_once __DIR__ . '/config.php'`, so as long as `includes/` sits next
-to wherever `public/`'s contents end up, the paths resolve correctly.
+```
+public_html/
+  bookings/             <- contents of this project's public/ folder
+    index.php
+    admin/ ...
+  includes/             <- sibling of bookings/, both directly inside public_html/
+  lib/
+  sql/                  <- only needed for the phpMyAdmin import in step 1;
+                           safe to delete after
+```
 
-Each of `includes/`, `lib/`, and `sql/` also ships its own `.htaccess` with
-`Require all denied` as a second layer of protection, in case they ever end
-up inside a web-servable folder by mistake.
+Because `includes/`, `lib/`, and `sql/` end up inside `public_html/` (the
+web-servable document root) in this layout — unlike a root deployment, where
+they'd usually sit one level above it — the `.htaccess` with
+`Require all denied` that ships in each of those three folders isn't just
+defense in depth here, it's the thing actually keeping them from being
+served directly. Confirm after upload that visiting
+`https://seanp.co.za/includes/config.php` returns a 403, not your config
+file.
 
 Upload via cPanel **File Manager** (zip the project, upload, extract) or FTP.
 
@@ -48,7 +59,11 @@ Upload via cPanel **File Manager** (zip the project, upload, extract) or FTP.
 In `includes/`, copy `config.example.php` to `config.php` and fill in:
 
 - `DB_HOST` / `DB_NAME` / `DB_USER` / `DB_PASS` — from step 1.
-- `APP_BASE_URL` — `https://seanp.co.za` (no trailing slash).
+- `APP_BASE_URL` — `https://seanp.co.za/bookings` (no trailing slash). This
+  must include the `/bookings` subfolder — every internal link, redirect,
+  and asset path in the app is generated relative to this value (via the
+  `url()` helper in `includes/functions.php`), so getting this one setting
+  right is what makes the whole site resolve correctly under the subfolder.
 - `APP_ENCRYPTION_KEY` — generate with:
   ```bash
   php -r "echo bin2hex(random_bytes(32));"
@@ -71,8 +86,8 @@ In `includes/`, copy `config.example.php` to `config.php` and fill in:
 3. **Redirect URIs** → Web → add **both** of these (one app registration,
    two callback pages — one for connecting a calendar while already logged
    in, one for the "Sign in with Microsoft" button on the login page):
-   - `https://seanp.co.za/admin/calendar-settings.php?action=callback`
-   - `https://seanp.co.za/auth/microsoft-callback.php`
+   - `https://seanp.co.za/bookings/admin/calendar-settings.php?action=callback`
+   - `https://seanp.co.za/bookings/auth/microsoft-callback.php`
 4. After creation, copy the **Application (client) ID** → `MS_CLIENT_ID`.
 5. **Certificates & secrets** → **New client secret** → copy the secret
    **value** (not the ID) → `MS_CLIENT_SECRET`.
@@ -93,7 +108,7 @@ under **Full access**. (Or via Exchange PowerShell:
 
 ## 5. First run
 
-1. Visit `https://seanp.co.za/index.php` — since no admin account exists
+1. Visit `https://seanp.co.za/bookings/index.php` — since no admin account exists
    yet, you'll be prompted to create one directly (name, email, password).
    This is the only account ever created without an invite link. **Use
    `admin@seanp.co.za` as the email** — Microsoft sign-in (next step) only

@@ -82,9 +82,10 @@ require __DIR__ . '/../../includes/partials/header.php';
     <?php endif; ?>
 </section>
 
-<script src="/assets/js/calendar.js"></script>
+<script src="<?= url('/assets/js/calendar.js') ?>"></script>
 <script>
 ElevateCalendar.init({
+    basePath: <?= json_encode(basePath()) ?>,
     gridEl: document.getElementById('cal-grid'),
     titleEl: document.getElementById('cal-title'),
     prevBtn: document.getElementById('cal-prev'),

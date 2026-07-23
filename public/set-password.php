@@ -12,7 +12,7 @@ if (!$tokenRow) {
     <div class="auth-card">
         <h1>This link is invalid or has expired</h1>
         <p>Ask Elevate SJC to send you a new one.</p>
-        <p><a href="/index.php">Back to log in</a></p>
+        <p><a href="<?= url('/index.php') ?>">Back to log in</a></p>
     </div>
     <?php
     require __DIR__ . '/../includes/partials/footer.php';
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         loginUser(['id' => $tokenRow['user_id'], 'name' => $tokenRow['name'], 'email' => $tokenRow['email'], 'role' => 'client']);
         flash('success', 'Your password is set. Welcome!');
-        redirect('/client/dashboard.php');
+        redirect(url('/client/dashboard.php'));
     }
 }
 

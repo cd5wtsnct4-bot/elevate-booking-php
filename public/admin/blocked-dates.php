@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flash('success', 'Date blocked.');
         }
     }
-    redirect('/admin/blocked-dates.php');
+    redirect(url('/admin/blocked-dates.php'));
 }
 
 $blocked = db()->query(

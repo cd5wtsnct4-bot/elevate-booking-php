@@ -13,7 +13,7 @@ if ($id) {
     $client = $stmt->fetch() ?: null;
     if (!$client) {
         flash('error', 'Client not found.');
-        redirect('/admin/clients.php');
+        redirect(url('/admin/clients.php'));
     }
 }
 
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             db()->prepare('UPDATE users SET name = ?, email = ?, phone = ?, status = ? WHERE id = ?')
                 ->execute([$name, strtolower($email), $phone ?: null, $status, $client['id']]);
             flash('success', 'Client updated.');
-            redirect('/admin/clients.php');
+            redirect(url('/admin/clients.php'));
         } elseif (!$errors) {
             $stmt = db()->prepare(
                 'INSERT INTO users (name, email, phone, role, status, must_change_password, created_by) VALUES (?, ?, ?, \'client\', \'active\', 1, ?)'
@@ -123,7 +123,7 @@ require __DIR__ . '/../../includes/partials/header.php';
     <?php endif; ?>
     <div class="booking-card__actions">
         <button type="submit" class="btn btn--primary"><?= $client ? 'Save changes' : 'Create client' ?></button>
-        <a href="/admin/clients.php" class="btn btn--ghost">Cancel</a>
+        <a href="<?= url('/admin/clients.php') ?>" class="btn btn--ghost">Cancel</a>
     </div>
 </form>
 

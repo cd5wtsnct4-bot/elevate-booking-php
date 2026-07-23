@@ -8,13 +8,13 @@ $pending = $_SESSION['pending_ms_login'] ?? null;
 
 if (!$pending || !hash_equals($pending['state'], (string) $state)) {
     flash('error', 'That Microsoft sign-in link expired or is invalid. Please try again.');
-    redirect('/index.php');
+    redirect(url('/index.php'));
 }
 unset($_SESSION['pending_ms_login']);
 
 if (isset($_GET['error'])) {
     flash('error', 'Microsoft sign-in was cancelled or failed: ' . h($_GET['error_description'] ?? $_GET['error']));
-    redirect('/index.php');
+    redirect(url('/index.php'));
 }
 
 try {
@@ -36,11 +36,11 @@ try {
 
     if (!$adminRow) {
         flash('error', "No admin account matches {$email}. Ask an existing admin to create one, or log in with a password instead.");
-        redirect('/index.php');
+        redirect(url('/index.php'));
     }
     if ($adminRow['status'] !== 'active') {
         flash('error', 'This admin account has been disabled.');
-        redirect('/index.php');
+        redirect(url('/index.php'));
     }
 
     // Combined step: signing in also connects this account's own calendar,
@@ -65,8 +65,8 @@ try {
 
     loginUser($adminRow);
     flash('success', 'Signed in with Microsoft — your calendar is connected.');
-    redirect('/admin/dashboard.php');
+    redirect(url('/admin/dashboard.php'));
 } catch (Throwable $e) {
     flash('error', 'Microsoft sign-in failed: ' . $e->getMessage());
-    redirect('/index.php');
+    redirect(url('/index.php'));
 }

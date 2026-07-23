@@ -45,7 +45,7 @@ require __DIR__ . '/../../includes/partials/header.php';
     <?php foreach ($syncIssues as $cal): ?>
         <div><?= h($cal['label']) ?> (<?= h($cal['mailbox_email']) ?>): <?= h($cal['last_sync_error']) ?></div>
     <?php endforeach; ?>
-    <a href="/admin/calendar-settings.php">Review calendar sync &rarr;</a>
+    <a href="<?= url('/admin/calendar-settings.php') ?>">Review calendar sync &rarr;</a>
 </div>
 <?php endif; ?>
 
@@ -64,7 +64,7 @@ require __DIR__ . '/../../includes/partials/header.php';
                 <td><?= h($b['client_name']) ?></td>
                 <td><?= $b['type'] === 'training' ? 'Training Session' : 'Meeting' ?></td>
                 <td><?= h($b['notes'] ?? '') ?></td>
-                <td><a href="/admin/bookings.php?status=pending">Review &rarr;</a></td>
+                <td><a href="<?= url('/admin/bookings.php?status=pending') ?>">Review &rarr;</a></td>
             </tr>
         <?php endforeach; ?>
         </tbody>

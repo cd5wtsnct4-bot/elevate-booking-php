@@ -3,7 +3,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/bootstrap.php';
 
 if (currentUser()) {
-    redirect(currentUser()['role'] === 'admin' ? '/admin/dashboard.php' : '/client/dashboard.php');
+    redirect(url(currentUser()['role'] === 'admin' ? '/admin/dashboard.php' : '/client/dashboard.php'));
 }
 
 $firstRun = !anyAdminExists();
@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $userId = (int) db()->lastInsertId();
 
             loginUser(['id' => $userId, 'name' => $name, 'email' => strtolower($email), 'role' => 'admin']);
-            redirect('/admin/dashboard.php');
+            redirect(url('/admin/dashboard.php'));
         }
     } else {
         $email = trim($_POST['email'] ?? '');
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 recordLoginAttempt($email, true);
                 loginUser($row);
-                redirect($row['role'] === 'admin' ? '/admin/dashboard.php' : '/client/dashboard.php');
+                redirect(url($row['role'] === 'admin' ? '/admin/dashboard.php' : '/client/dashboard.php'));
             }
         }
     }
@@ -99,7 +99,7 @@ require __DIR__ . '/../includes/partials/header.php';
 
     <?php if (!$firstRun && MS_CLIENT_ID !== '' && MS_CLIENT_SECRET !== ''): ?>
     <div class="auth-divider"><span>or</span></div>
-    <a href="/auth/microsoft-login.php" class="btn btn--ghost btn--block">Sign in with Microsoft</a>
+    <a href="<?= url('/auth/microsoft-login.php') ?>" class="btn btn--ghost btn--block">Sign in with Microsoft</a>
     <p class="auth-card__hint">For admins only — signs you in with your Elevate SJC Microsoft 365 account and connects your calendar.</p>
     <?php endif; ?>
 </div>

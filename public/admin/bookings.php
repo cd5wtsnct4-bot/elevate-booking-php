@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!$booking) {
         flash('error', 'Booking not found.');
-        redirect('/admin/bookings.php');
+        redirect(url('/admin/bookings.php'));
     }
 
     $warning = null;
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($warning) {
         flash('error', $warning);
     }
-    redirect('/admin/bookings.php?status=' . rawurlencode($_GET['status'] ?? 'pending'));
+    redirect(url('/admin/bookings.php?status=' . rawurlencode($_GET['status'] ?? 'pending')));
 }
 
 $statusFilter = $_GET['status'] ?? 'pending';
@@ -64,12 +64,12 @@ require __DIR__ . '/../../includes/partials/header.php';
 ?>
 <div class="page-intro page-intro--with-action">
     <h1>Bookings</h1>
-    <a href="/admin/booking-form.php" class="btn btn--primary">+ Add booking</a>
+    <a href="<?= url('/admin/booking-form.php') ?>" class="btn btn--primary">+ Add booking</a>
 </div>
 
 <nav class="tab-nav">
     <?php foreach (['pending' => 'Pending', 'approved' => 'Approved', 'declined' => 'Declined', 'cancelled' => 'Cancelled', 'all' => 'All'] as $key => $label): ?>
-        <a href="/admin/bookings.php?status=<?= $key ?>" class="<?= $statusFilter === $key ? 'is-active' : '' ?>"><?= $label ?></a>
+        <a href="<?= url('/admin/bookings.php?status=' . $key) ?>" class="<?= $statusFilter === $key ? 'is-active' : '' ?>"><?= $label ?></a>
     <?php endforeach; ?>
 </nav>
 
@@ -89,7 +89,7 @@ require __DIR__ . '/../../includes/partials/header.php';
             <td><?= h($b['calendar_label'] ?? '—') ?></td>
             <td><?= h($b['notes'] ?? '') ?></td>
             <td class="data-table__actions">
-                <a href="/admin/booking-form.php?id=<?= (int) $b['id'] ?>">Edit</a>
+                <a href="<?= url('/admin/booking-form.php?id=' . (int) $b['id']) ?>">Edit</a>
 
                 <?php if ($b['status'] === 'pending'): ?>
                 <form method="post" class="inline-form">

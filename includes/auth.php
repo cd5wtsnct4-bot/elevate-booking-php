@@ -14,7 +14,7 @@ function requireLogin(): array
 {
     $user = currentUser();
     if (!$user) {
-        redirect('/index.php');
+        redirect(url('/index.php'));
     }
     return $user;
 }

@@ -11,9 +11,12 @@ define('DB_USER', 'your_db_user');
 define('DB_PASS', 'your_db_password');
 
 // --- App ---
-// Public URL of the site, no trailing slash. Used to build the Microsoft
-// OAuth redirect URI and links in emails.
-define('APP_BASE_URL', 'https://seanp.co.za');
+// Public URL of the site, no trailing slash. Include a subfolder here if
+// the app isn't deployed at the domain root, e.g. 'https://seanp.co.za/bookings'
+// — every internal link, redirect, and asset path is generated relative to
+// this value (see url() in functions.php), so this one setting controls it.
+// Also used to build the Microsoft OAuth redirect URI and links in emails.
+define('APP_BASE_URL', 'https://seanp.co.za/bookings');
 
 // 32-byte key (64 hex chars) used to encrypt OAuth tokens at rest.
 // Generate one with: php -r "echo bin2hex(random_bytes(32));"
@@ -30,7 +33,9 @@ define('MAIL_FROM_NAME', 'Elevate SJC');
 
 // --- Microsoft Graph / Azure App Registration ---
 // portal.azure.com > Microsoft Entra ID > App registrations > New registration
-// Redirect URI (Web): {APP_BASE_URL}/admin/calendar-settings.php?action=callback
+// Redirect URIs (Web) — add both:
+//   {APP_BASE_URL}/admin/calendar-settings.php?action=callback
+//   {APP_BASE_URL}/auth/microsoft-callback.php
 // Delegated permissions: Calendars.ReadWrite, offline_access, User.Read
 define('MS_CLIENT_ID', '');
 define('MS_CLIENT_SECRET', '');

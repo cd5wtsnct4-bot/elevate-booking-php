@@ -15,7 +15,7 @@ if ($id) {
     $booking = $stmt->fetch() ?: null;
     if (!$booking) {
         flash('error', 'Booking not found.');
-        redirect('/admin/bookings.php');
+        redirect(url('/admin/bookings.php'));
     }
 }
 
@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($warning) {
             flash('error', $warning);
         }
-        redirect('/admin/bookings.php?status=all');
+        redirect(url('/admin/bookings.php?status=all'));
     }
 }
 
@@ -167,7 +167,7 @@ require __DIR__ . '/../../includes/partials/header.php';
 
     <div class="booking-card__actions">
         <button type="submit" class="btn btn--primary"><?= $booking ? 'Save changes' : 'Create booking' ?></button>
-        <a href="/admin/bookings.php?status=all" class="btn btn--ghost">Cancel</a>
+        <a href="<?= url('/admin/bookings.php?status=all') ?>" class="btn btn--ghost">Cancel</a>
     </div>
 </form>
 <?php require __DIR__ . '/../../includes/partials/footer.php'; ?>
