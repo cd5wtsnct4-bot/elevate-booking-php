@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__ . '/../../includes/bootstrap.php';
 require_once __DIR__ . '/../../lib/BookingSync.php';
+require_once __DIR__ . '/../../lib/MicrosoftGraph.php';
 
 $admin = requireAdmin();
 
@@ -95,6 +96,27 @@ foreach ($monthBookings as $b) {
 
 $calendars = db()->query('SELECT * FROM calendar_accounts ORDER BY label')->fetchAll();
 
+// Dates busy on a connected Outlook calendar but with no corresponding
+// `bookings` row (e.g. an event created directly in Outlook, not through
+// this app) — without this, such dates would incorrectly show as
+// "Available" here even though the client-facing calendar already
+// correctly blocks them via this same Graph check.
+$graphBusyDates = [];
+$graphOk = true;
+$syncIssues = [];
+foreach ($calendars as $cal) {
+    try {
+        foreach (MicrosoftGraph::getBusyDates($cal, $start, $end) as $iso) {
+            $graphBusyDates[$iso] = true;
+        }
+    } catch (Throwable $e) {
+        $graphOk = false;
+        $syncIssues[] = ['label' => $cal['label'], 'mailbox' => $cal['mailbox_email'], 'error' => $e->getMessage()];
+        db()->prepare('UPDATE calendar_accounts SET last_sync_error = ? WHERE id = ?')
+            ->execute([substr($e->getMessage(), 0, 500), $cal['id']]);
+    }
+}
+
 $displayedBookings = $selectedDate
     ? array_values(array_filter($monthBookings, fn ($b) => $b['booking_date'] === $selectedDate))
     : $monthBookings;
@@ -106,6 +128,17 @@ $pageTitle = 'Calendar';
 require __DIR__ . '/../../includes/partials/header.php';
 ?>
 <div class="page-intro"><h1>Calendar</h1><p>A month-at-a-glance view of every booking and blocked date. Click a day to see its details below.</p></div>
+
+<?php if (!$graphOk): ?>
+<div class="alert alert--warning">
+    <strong>Calendar sync issue.</strong> Dates below reflect app bookings and blocked dates only —
+    events on the calendars below could not be checked, so they might not be reflected here.
+    <?php foreach ($syncIssues as $issue): ?>
+        <div><?= h($issue['label']) ?> (<?= h($issue['mailbox']) ?>): <?= h($issue['error']) ?></div>
+    <?php endforeach; ?>
+    <a href="<?= url('/admin/calendar-settings.php') ?>">Review calendar sync &rarr;</a>
+</div>
+<?php endif; ?>
 
 <section class="admin-calendar-card">
     <div class="calendar-card__nav">
@@ -130,10 +163,12 @@ require __DIR__ . '/../../includes/partials/header.php';
             $dayOfWeek = (int) date('w', strtotime($iso));
             $isWeekend = $dayOfWeek === 0 || $dayOfWeek === 6;
             $isBlocked = isset($blockedByDate[$iso]);
+            $isGraphBusy = isset($graphBusyDates[$iso]);
             $isPast = $iso < $todayIso;
             $isSelected = $selectedDate === $iso;
             $isToday = $iso === $todayIso;
-            $hasAny = $isBlocked || array_sum($counts) > 0;
+            $bookingCount = array_sum($counts);
+            $hasAny = $isBlocked || $isGraphBusy || $bookingCount > 0;
             ?>
             <?php if ($isWeekend): ?>
                 <!-- Weekends are never bookable, so they're not click-selectable here either — shown for context only. -->
@@ -157,6 +192,9 @@ require __DIR__ . '/../../includes/partials/header.php';
                             <span class="admin-calendar-day__tag admin-calendar-day__tag--<?= $tone ?>"><?= $counts[$status] ?> <?= h(ucfirst($status)) ?></span>
                         <?php endif; ?>
                     <?php endforeach; ?>
+                    <?php if ($isGraphBusy && $bookingCount === 0 && !$isBlocked): ?>
+                        <span class="admin-calendar-day__tag admin-calendar-day__tag--blocked">Synced Event</span>
+                    <?php endif; ?>
                     <?php if (!$hasAny && !$isPast): ?>
                         <span class="admin-calendar-day__tag admin-calendar-day__tag--available">Available</span>
                     <?php endif; ?>
@@ -170,7 +208,7 @@ require __DIR__ . '/../../includes/partials/header.php';
         <li><span class="dot" style="background:var(--success-bg);border-color:var(--success)"></span> Approved</li>
         <li><span class="dot" style="background:var(--warning-bg);border-color:var(--warning)"></span> Pending</li>
         <li><span class="dot" style="background:var(--danger-bg);border-color:var(--danger)"></span> Declined</li>
-        <li><span class="dot" style="background:var(--dark-gray)"></span> Blocked</li>
+        <li><span class="dot" style="background:var(--dark-gray)"></span> Blocked / synced calendar event</li>
         <li><span class="dot" style="background:var(--light-gray)"></span> Weekend (not bookable)</li>
     </ul>
 </section>
