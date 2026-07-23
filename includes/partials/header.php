@@ -28,6 +28,7 @@ $bodyClass = $bodyClass ?? '';
         <nav class="main-nav">
             <?php if ($user['role'] === 'admin'): ?>
                 <a href="<?= url('/admin/dashboard.php') ?>">Dashboard</a>
+                <a href="<?= url('/admin/calendar.php') ?>">Calendar</a>
                 <a href="<?= url('/admin/bookings.php') ?>">Bookings</a>
                 <a href="<?= url('/admin/clients.php') ?>">Clients</a>
                 <a href="<?= url('/admin/blocked-dates.php') ?>">Blocked Dates</a>

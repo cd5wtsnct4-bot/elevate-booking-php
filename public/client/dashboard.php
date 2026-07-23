@@ -35,6 +35,7 @@ require __DIR__ . '/../../includes/partials/header.php';
             <li><span class="dot dot--requested-mine"></span> Your request</li>
             <li><span class="dot dot--requested"></span> Requested</li>
             <li><span class="dot dot--booked"></span> Unavailable</li>
+            <li><span class="dot dot--weekend"></span> Weekend (not bookable)</li>
         </ul>
     </section>
 

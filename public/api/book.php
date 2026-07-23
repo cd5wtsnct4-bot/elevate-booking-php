@@ -32,6 +32,13 @@ if (strlen($notes) > 2000) {
     jsonResponse(['error' => 'Notes are too long.'], 400);
 }
 
+// Weekends are never bookable — enforced here (not just hidden client-side
+// in calendar.js) so a direct API call can't bypass it.
+$dayOfWeek = (int) date('w', strtotime($date));
+if ($dayOfWeek === 0 || $dayOfWeek === 6) {
+    jsonResponse(['error' => 'Weekends are not available for booking.'], 400);
+}
+
 $status = Availability::statusForDate($date, $user['id']);
 if ($status !== 'open') {
     jsonResponse(['error' => 'That date is no longer available. Please choose another.'], 409);

@@ -11,6 +11,11 @@
         return meta ? meta.getAttribute('content') : '';
     }
 
+    function isWeekend(iso) {
+        const day = new Date(iso + 'T00:00:00').getDay();
+        return day === 0 || day === 6;
+    }
+
     function init(opts) {
         const basePath = opts.basePath || '';
         const state = {
@@ -52,14 +57,28 @@
 
             Object.keys(data.days).forEach((iso) => {
                 const status = data.days[iso];
+                const weekend = isWeekend(iso);
                 const day = parseInt(iso.slice(8, 10), 10);
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = 'calendar-day calendar-day--' + status.replace('_', '-');
-                btn.textContent = String(day);
+                btn.className = 'calendar-day calendar-day--' + (weekend ? 'weekend' : status.replace('_', '-'));
                 btn.setAttribute('data-date', iso);
 
-                const selectable = (opts.selectableStatuses || ['open']).indexOf(status) !== -1;
+                const num = document.createElement('span');
+                num.className = 'calendar-day__num';
+                num.textContent = String(day);
+                btn.appendChild(num);
+
+                if (!weekend && status === 'open') {
+                    const tag = document.createElement('span');
+                    tag.className = 'calendar-day__label';
+                    tag.textContent = 'Available';
+                    btn.appendChild(tag);
+                }
+
+                // Weekends are never bookable, regardless of the computed
+                // status — enforced server-side too, in api/book.php.
+                const selectable = !weekend && (opts.selectableStatuses || ['open']).indexOf(status) !== -1;
                 if (selectable) {
                     btn.addEventListener('click', () => selectDate(iso));
                 } else {
