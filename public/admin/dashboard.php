@@ -24,6 +24,17 @@ $stmt = db()->query(
 );
 $upcoming = $stmt->fetchAll();
 
+$stmt = db()->query(
+    "SELECT b.*, u.name AS client_name, u.email AS client_email, ca.label AS calendar_label
+     FROM bookings b
+     JOIN users u ON u.id = b.user_id
+     LEFT JOIN calendar_accounts ca ON ca.id = b.calendar_account_id
+     WHERE b.type = 'training' AND b.status = 'approved'
+       AND b.booking_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 14 DAY)
+     ORDER BY b.booking_date ASC"
+);
+$upcomingTrainings = $stmt->fetchAll();
+
 $syncIssues = db()->query("SELECT * FROM calendar_accounts WHERE last_sync_error IS NOT NULL")->fetchAll();
 
 $pageTitle = 'Admin dashboard';
@@ -65,6 +76,35 @@ require __DIR__ . '/../../includes/partials/header.php';
                 <td><?= $b['type'] === 'training' ? 'Training Session' : 'Meeting' ?></td>
                 <td><?= h($b['notes'] ?? '') ?></td>
                 <td><a href="<?= url('/admin/bookings.php?status=pending') ?>">Review &rarr;</a></td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+    </div>
+    <?php endif; ?>
+</section>
+
+<section class="admin-section">
+    <h2>Upcoming training sessions (next 14 days)</h2>
+    <?php if (!$upcomingTrainings): ?>
+        <p class="muted">No training sessions booked in the next two weeks.</p>
+    <?php else: ?>
+    <div class="table-scroll">
+    <table class="data-table">
+        <thead><tr><th>Date</th><th>Client</th><th>Notes</th><th>Calendar sync</th></tr></thead>
+        <tbody>
+        <?php foreach ($upcomingTrainings as $b): ?>
+            <tr>
+                <td><?= h(formatDateHuman($b['booking_date'])) ?></td>
+                <td><?= h($b['client_name']) ?><br><span class="muted"><?= h($b['client_email']) ?></span></td>
+                <td><?= h($b['notes'] ?? '') ?></td>
+                <td>
+                    <?php if ($b['calendar_label']): ?>
+                        <span class="status-pill status-pill--approved">Synced &mdash; <?= h($b['calendar_label']) ?></span>
+                    <?php else: ?>
+                        <span class="status-pill status-pill--pending">Not synced</span>
+                    <?php endif; ?>
+                </td>
             </tr>
         <?php endforeach; ?>
         </tbody>
