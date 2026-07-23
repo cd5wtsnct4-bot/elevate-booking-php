@@ -1,4 +1,6 @@
 includes/config.php
+includes/config.production.php
+includes/config.*.php
 *.log
 .DS_Store
 *.zip
