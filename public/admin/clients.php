@@ -46,6 +46,7 @@ require __DIR__ . '/../../includes/partials/header.php';
 <?php if (!$clients): ?>
     <p class="muted">No clients yet. Add one to give them access to the booking calendar.</p>
 <?php else: ?>
+<div class="table-scroll">
 <table class="data-table">
     <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Status</th><th>Added</th><th></th></tr></thead>
     <tbody>
@@ -75,5 +76,6 @@ require __DIR__ . '/../../includes/partials/header.php';
     <?php endforeach; ?>
     </tbody>
 </table>
+</div>
 <?php endif; ?>
 <?php require __DIR__ . '/../../includes/partials/footer.php'; ?>

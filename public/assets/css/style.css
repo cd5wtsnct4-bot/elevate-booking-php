@@ -249,6 +249,7 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--charcoal); 
 .admin-section { margin-bottom: 40px; }
 
 /* ---------- Tables ---------- */
+.table-scroll { overflow-x: auto; }
 .data-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
 .data-table th, .data-table td {
     text-align: left;

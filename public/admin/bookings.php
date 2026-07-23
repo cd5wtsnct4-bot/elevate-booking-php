@@ -76,6 +76,7 @@ require __DIR__ . '/../../includes/partials/header.php';
 <?php if (!$bookings): ?>
     <p class="muted">No bookings in this view.</p>
 <?php else: ?>
+<div class="table-scroll">
 <table class="data-table">
     <thead><tr><th>Date</th><th>Client</th><th>Type</th><th>Status</th><th>Calendar</th><th>Notes</th><th></th></tr></thead>
     <tbody>
@@ -129,5 +130,6 @@ require __DIR__ . '/../../includes/partials/header.php';
     <?php endforeach; ?>
     </tbody>
 </table>
+</div>
 <?php endif; ?>
 <?php require __DIR__ . '/../../includes/partials/footer.php'; ?>

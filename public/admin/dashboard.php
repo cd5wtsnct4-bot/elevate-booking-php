@@ -54,6 +54,7 @@ require __DIR__ . '/../../includes/partials/header.php';
     <?php if (!$pending): ?>
         <p class="muted">Nothing waiting on you right now.</p>
     <?php else: ?>
+    <div class="table-scroll">
     <table class="data-table">
         <thead><tr><th>Date</th><th>Client</th><th>Type</th><th>Notes</th><th></th></tr></thead>
         <tbody>
@@ -68,6 +69,7 @@ require __DIR__ . '/../../includes/partials/header.php';
         <?php endforeach; ?>
         </tbody>
     </table>
+    </div>
     <?php endif; ?>
 </section>
 
@@ -76,6 +78,7 @@ require __DIR__ . '/../../includes/partials/header.php';
     <?php if (!$upcoming): ?>
         <p class="muted">Nothing confirmed yet.</p>
     <?php else: ?>
+    <div class="table-scroll">
     <table class="data-table">
         <thead><tr><th>Date</th><th>Client</th><th>Type</th></tr></thead>
         <tbody>
@@ -88,6 +91,7 @@ require __DIR__ . '/../../includes/partials/header.php';
         <?php endforeach; ?>
         </tbody>
     </table>
+    </div>
     <?php endif; ?>
 </section>
 <?php require __DIR__ . '/../../includes/partials/footer.php'; ?>

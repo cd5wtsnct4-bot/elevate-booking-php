@@ -65,6 +65,7 @@ require __DIR__ . '/../../includes/partials/header.php';
 <?php if (!$blocked): ?>
     <p class="muted">No upcoming blocked dates.</p>
 <?php else: ?>
+<div class="table-scroll">
 <table class="data-table">
     <thead><tr><th>Date</th><th>Applies to</th><th>Reason</th><th></th></tr></thead>
     <tbody>
@@ -85,5 +86,6 @@ require __DIR__ . '/../../includes/partials/header.php';
     <?php endforeach; ?>
     </tbody>
 </table>
+</div>
 <?php endif; ?>
 <?php require __DIR__ . '/../../includes/partials/footer.php'; ?>

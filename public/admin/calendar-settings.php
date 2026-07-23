@@ -117,6 +117,7 @@ require __DIR__ . '/../../includes/partials/header.php';
     <?php if (!$calendars): ?>
         <p class="muted">No calendars connected yet.</p>
     <?php else: ?>
+    <div class="table-scroll">
     <table class="data-table">
         <thead><tr><th>Label</th><th>Mailbox</th><th>Type</th><th>Status</th><th></th></tr></thead>
         <tbody>
@@ -145,6 +146,7 @@ require __DIR__ . '/../../includes/partials/header.php';
         <?php endforeach; ?>
         </tbody>
     </table>
+    </div>
     <?php endif; ?>
 </section>
 

@@ -64,6 +64,7 @@ require __DIR__ . '/../../includes/partials/header.php';
     <?php if (!$myBookings): ?>
         <p class="muted">You haven't requested anything yet.</p>
     <?php else: ?>
+    <div class="table-scroll">
     <table class="data-table">
         <thead><tr><th>Date</th><th>Type</th><th>Status</th><th>Notes</th></tr></thead>
         <tbody>
@@ -77,6 +78,7 @@ require __DIR__ . '/../../includes/partials/header.php';
         <?php endforeach; ?>
         </tbody>
     </table>
+    </div>
     <?php endif; ?>
 </section>
 
