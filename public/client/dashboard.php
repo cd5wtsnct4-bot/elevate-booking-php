@@ -27,7 +27,8 @@ require __DIR__ . '/../../includes/partials/header.php';
             <button type="button" id="cal-next" class="btn btn--ghost" aria-label="Next month">&rarr;</button>
         </div>
         <div id="cal-sync-warning" class="alert alert--warning" hidden>
-            Live calendar sync is temporarily unavailable — dates shown reflect manual bookings only.
+            Live calendar sync is temporarily unavailable, so we can't confirm which dates are actually free right now.
+            New requests are paused until it's back — please try again shortly, or contact us directly to book.
         </div>
         <div class="calendar-grid" id="cal-grid" aria-live="polite"></div>
         <ul class="calendar-legend">

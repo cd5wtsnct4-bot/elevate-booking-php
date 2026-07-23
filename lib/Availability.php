@@ -25,9 +25,25 @@ class Availability
 
     public static function statusForDate(string $isoDate, ?int $viewerUserId): string
     {
+        return self::detailForDate($isoDate, $viewerUserId)['status'];
+    }
+
+    /**
+     * Like statusForDate(), but also reports whether every connected
+     * calendar's live Graph check actually succeeded. Callers that are
+     * about to accept a new booking (not just display availability) should
+     * check graphOk and refuse to proceed if false — a status of 'open'
+     * doesn't mean much if we couldn't actually confirm it against the
+     * real calendar.
+     */
+    public static function detailForDate(string $isoDate, ?int $viewerUserId): array
+    {
         $date = new DateTimeImmutable($isoDate);
         $result = self::compute($date, $date, $viewerUserId);
-        return $result['days'][$isoDate] ?? 'open';
+        return [
+            'status' => $result['days'][$isoDate] ?? 'open',
+            'graphOk' => $result['graphOk'],
+        ];
     }
 
     private static function compute(DateTimeImmutable $start, DateTimeImmutable $end, ?int $viewerUserId): array

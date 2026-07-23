@@ -37,7 +37,8 @@
 
         function render(data) {
             opts.titleEl.textContent = MONTH_NAMES[state.month - 1] + ' ' + state.year;
-            opts.syncWarningEl.hidden = !!data.calendarSyncOk;
+            const syncOk = !!data.calendarSyncOk;
+            opts.syncWarningEl.hidden = syncOk;
 
             const grid = opts.gridEl;
             grid.innerHTML = '';
@@ -69,7 +70,7 @@
                 num.textContent = String(day);
                 btn.appendChild(num);
 
-                if (!weekend && status === 'open') {
+                if (!weekend && syncOk && status === 'open') {
                     const tag = document.createElement('span');
                     tag.className = 'calendar-day__label';
                     tag.textContent = 'Available';
@@ -77,8 +78,12 @@
                 }
 
                 // Weekends are never bookable, regardless of the computed
-                // status — enforced server-side too, in api/book.php.
-                const selectable = !weekend && (opts.selectableStatuses || ['open']).indexOf(status) !== -1;
+                // status — enforced server-side too, in api/book.php. When
+                // live calendar sync is down, an 'open' status can't be
+                // trusted (we may just have failed to see a real conflict),
+                // so nothing is selectable until it's back — also enforced
+                // server-side, in Availability::detailForDate()'s graphOk check.
+                const selectable = !weekend && syncOk && (opts.selectableStatuses || ['open']).indexOf(status) !== -1;
                 if (selectable) {
                     btn.addEventListener('click', () => selectDate(iso));
                 } else {

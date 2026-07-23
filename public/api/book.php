@@ -39,8 +39,16 @@ if ($dayOfWeek === 0 || $dayOfWeek === 6) {
     jsonResponse(['error' => 'Weekends are not available for booking.'], 400);
 }
 
-$status = Availability::statusForDate($date, $user['id']);
-if ($status !== 'open') {
+$detail = Availability::detailForDate($date, $user['id']);
+
+// Fail closed: if a connected calendar's live Graph check just failed, an
+// 'open' status doesn't actually mean the date is free — it means we
+// couldn't check. Refuse rather than risk double-booking something that's
+// genuinely busy on the real Outlook calendar but invisible to us right now.
+if (!$detail['graphOk']) {
+    jsonResponse(['error' => "We can't verify live calendar availability right now, so new requests are paused. Please try again shortly, or contact us directly to book."], 503);
+}
+if ($detail['status'] !== 'open') {
     jsonResponse(['error' => 'That date is no longer available. Please choose another.'], 409);
 }
 
