@@ -102,7 +102,7 @@ $calendars = db()->query('SELECT * FROM calendar_accounts ORDER BY label')->fetc
 $pageTitle = 'Calendar sync';
 require __DIR__ . '/../../includes/partials/header.php';
 ?>
-<div class="page-intro"><h1>Calendar sync</h1><p>Connect <code>admin@seanp.co.za</code> and the <code>info@seanp.co.za</code> shared mailbox so client availability reflects both calendars.</p></div>
+<div class="page-intro"><h1>Calendar sync</h1><p>Connect <code>claudette@seanp.co.za</code> and the <code>info@seanp.co.za</code> shared mailbox so client availability reflects both calendars.</p></div>
 
 <?php if (!$msConfigured): ?>
 <div class="alert alert--warning">
@@ -164,7 +164,7 @@ require __DIR__ . '/../../includes/partials/header.php';
         </label>
         <p class="muted">
             To connect <code>info@seanp.co.za</code> as a shared mailbox, sign in with the
-            <code>admin@seanp.co.za</code> Microsoft account (which needs Full Access delegate permission
+            <code>claudette@seanp.co.za</code> Microsoft account (which needs Full Access delegate permission
             on that shared mailbox — see DEPLOY.md) and enter <code>info@seanp.co.za</code> above.
         </p>
         <p class="muted">

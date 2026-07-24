@@ -1,7 +1,7 @@
 # Elevate SJC — Booking Portal
 
 A login-only booking portal for Elevate SJC clients. Clients see live
-availability merged from two Microsoft 365 calendars (`admin@seanp.co.za`
+availability merged from two Microsoft 365 calendars (`claudette@seanp.co.za`
 and the `info@seanp.co.za` shared mailbox) and submit meeting/training
 requests, which sit as **pending** until an admin approves them. Approving a
 request creates a matching all-day event on the chosen calendar; declining,

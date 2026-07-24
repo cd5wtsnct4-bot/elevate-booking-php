@@ -36,7 +36,11 @@ $bodyClass = $bodyClass ?? '';
             <?php else: ?>
                 <a href="<?= url('/client/dashboard.php') ?>">Calendar</a>
             <?php endif; ?>
-            <span class="main-nav__user">Signed in as <?= h($user['name']) ?></span>
+            <?php if ($user['role'] === 'admin'): ?>
+                <a href="<?= url('/admin/account.php') ?>" class="main-nav__user">Signed in as <?= h($user['name']) ?></a>
+            <?php else: ?>
+                <span class="main-nav__user">Signed in as <?= h($user['name']) ?></span>
+            <?php endif; ?>
             <a href="<?= url('/logout.php') ?>" class="main-nav__logout">Log out</a>
         </nav>
         <?php endif; ?>

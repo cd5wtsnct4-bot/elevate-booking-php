@@ -81,8 +81,8 @@ In `includes/`, copy `config.example.php` to `config.php` and fill in:
    ID** → **App registrations** → **New registration**.
 2. Name it anything (e.g. "Elevate SJC Booking"). Supported account types:
    "Accounts in this organizational directory only" is fine if both
-   `admin@seanp.co.za` and `info@seanp.co.za` are on the same Microsoft 365
-   tenant.
+   `claudette@seanp.co.za` and `info@seanp.co.za` are on the same Microsoft
+   365 tenant.
 3. **Redirect URIs** → Web → add **both** of these (one app registration,
    two callback pages — one for connecting a calendar while already logged
    in, one for the "Sign in with Microsoft" button on the login page):
@@ -102,22 +102,28 @@ In `includes/`, copy `config.example.php` to `config.php` and fill in:
 For the admin account to connect `info@seanp.co.za`'s calendar, it needs
 **Full Access** delegate permission on that shared mailbox. In the Microsoft
 365 admin center: **Teams & groups** → **Shared mailboxes** → select
-`info@seanp.co.za` → **Manage mailbox delegation** → add `admin@seanp.co.za`
-under **Full access**. (Or via Exchange PowerShell:
-`Add-MailboxPermission -Identity info@seanp.co.za -User admin@seanp.co.za -AccessRights FullAccess`.)
+`info@seanp.co.za` → **Manage mailbox delegation** → add
+`claudette@seanp.co.za` under **Full access**. (Or via Exchange PowerShell:
+`Add-MailboxPermission -Identity info@seanp.co.za -User claudette@seanp.co.za -AccessRights FullAccess`.)
+
+> **To-do:** this permission was previously granted to `admin@seanp.co.za`.
+> If `claudette@seanp.co.za` is a different Microsoft 365 account, it needs
+> this same Full Access + Calendar folder Editor permission granted to it
+> separately before "Sign in with Microsoft" or shared-calendar sync will
+> work for her — this has **not** been set up yet as part of this change.
 
 ## 5. First run
 
 1. Visit `https://seanp.co.za/bookings/index.php` — since no admin account exists
    yet, you'll be prompted to create one directly (name, email, password).
    This is the only account ever created without an invite link. **Use
-   `admin@seanp.co.za` as the email** — Microsoft sign-in (next step) only
-   works if it exactly matches an existing admin account's email.
+   `claudette@seanp.co.za` as the email** — Microsoft sign-in (next step)
+   only works if it exactly matches an existing admin account's email.
 2. Log in, go to **Calendar Sync**, and connect **info@seanp.co.za** as a
    shared mailbox: label it "Info", enter `info@seanp.co.za` in the shared
-   mailbox field, and sign in as `admin@seanp.co.za` (per the delegate
+   mailbox field, and sign in as `claudette@seanp.co.za` (per the delegate
    permission granted in step 4).
-   - You don't need to separately connect `admin@seanp.co.za`'s own
+   - You don't need to separately connect `claudette@seanp.co.za`'s own
      calendar here — signing in with the **"Sign in with Microsoft"**
      button on the login page (see below) does that in the same step.
 3. Go to **Clients** → **Add client** to create your first client account.
